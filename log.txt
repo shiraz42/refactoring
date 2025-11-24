@@ -1,9 +1,10 @@
+893d2df Task 2.4
+529ef30 Task 2.3
+1caa634 Task 2.2
+0b67eb8 Task 2.1
+58154ca Task 2.1
+d32f88a Task 1.2
 6050422 Task 1.1: Fixed all CheckStyle issues
-Task 1.2
-Task 2.1
-Task 2.2
-Task 2.3
-Task 2.4
 2b4f164 fixed tests for the not-for-credit tasks; parameter ordering and ensuring consistent line endings.
 ff5004e adding shortcut keys for Inline Variable (Re: Piazza question)
 b545fe2 clarifying extracted method names in README.md
