@@ -30,23 +30,23 @@ public class StatementPrinter {
         final StringBuilder result = new StringBuilder("Statement for " + getInvoice().getCustomer()
                 + System.lineSeparator());
 
-        final NumberFormat frmt = NumberFormat.getCurrencyInstance(Locale.US);
-
         for (Performance performance : getInvoice().getPerformances()) {
 
-            // add volume credits (now via helper)
+            // add volume credits
             volumeCredits += getVolumeCredits(performance);
 
             // print line for this order
             result.append(String.format("  %s: %s (%s seats)%n",
                     getPlay(performance).getName(),
-                    frmt.format(getAmount(performance) / PERCENT_FACTOR),
+                    usd(getAmount(performance)),
                     performance.getAudience()));
 
             totalAmount += getAmount(performance);
         }
-        result.append(String.format("Amount owed is %s%n", frmt.format(totalAmount / PERCENT_FACTOR)));
+
+        result.append(String.format("Amount owed is %s%n", usd(totalAmount)));
         result.append(String.format("You earned %s credits%n", volumeCredits));
+
         return result.toString();
     }
 
@@ -63,6 +63,7 @@ public class StatementPrinter {
     private int getAmount(Performance performance) {
         int result;
         final Play play = getPlay(performance);
+
         switch (play.getType()) {
             case "tragedy":
                 result = TRAGEDY_BASE_AMOUNT;
@@ -71,6 +72,7 @@ public class StatementPrinter {
                             * (performance.getAudience() - BASE_VOLUME_CREDIT_THRESHOLD);
                 }
                 break;
+
             case "comedy":
                 result = COMEDY_BASE_AMOUNT;
                 if (performance.getAudience() > COMEDY_AUDIENCE_THRESHOLD) {
@@ -80,6 +82,7 @@ public class StatementPrinter {
                 }
                 result += COMEDY_AMOUNT_PER_AUDIENCE * performance.getAudience();
                 break;
+
             default:
                 throw new RuntimeException(String.format("unknown type: %s", play.getType()));
         }
@@ -92,15 +95,21 @@ public class StatementPrinter {
     private int getVolumeCredits(Performance performance) {
         int result = 0;
 
-        // base volume credits
         result += Math.max(performance.getAudience() - BASE_VOLUME_CREDIT_THRESHOLD, 0);
 
-        // extra credit for every five comedy attendees
         if ("comedy".equals(getPlay(performance).getType())) {
             result += performance.getAudience() / COMEDY_EXTRA_VOLUME_FACTOR;
         }
 
         return result;
+    }
+
+    /**
+     * Converts an amount in cents to a US currency string.
+     */
+    private String usd(int amount) {
+        NumberFormat usdFormatter = NumberFormat.getCurrencyInstance(Locale.US);
+        return usdFormatter.format(amount / (double) PERCENT_FACTOR);
     }
 
     public Invoice getInvoice() {
